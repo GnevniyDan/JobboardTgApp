@@ -33,7 +33,7 @@ $ pip install -r requirements.txt
 ### 3. Запуск сервера
 Запустите сервер Flask:
 ```bash
-$ python app.py
+$ python jobboard_backend.py
 ```
 Сервер будет запущен по адресу `http://127.0.0.1:5000`.
 
