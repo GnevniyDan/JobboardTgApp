@@ -1,11 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
     let isAuthorized = localStorage.getItem('isAuthorized') === 'true';
-    const AUTH_TOKEN = '123'; // Токен авторизации
-
-    // Показать кнопку "Найти работу" при загрузке страницы
-    document.getElementById('findJob').style.display = 'inline-block';
-
-    // Настроить видимость кнопки "Опубликовать вакансию" и "Войти/Выйти" в зависимости от авторизации
+    const AUTH_TOKEN = '123'; 
     if (isAuthorized) {
         document.getElementById('publishJob').style.display = 'inline-block';
         document.getElementById('loginButton').textContent = 'Выйти';
@@ -14,17 +9,22 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('loginButton').textContent = 'Войти';
     }
 
-    // Add test jobs when the "findJob" button is clicked
     document.getElementById('findJob').addEventListener('click', function() {
+        document.getElementById('findJob').style.display = 'none';
+
         fetch('http://127.0.0.1:5000/api/jobs')
             .then(response => response.json())
             .then(data => {
                 const jobCardsContainer = document.getElementById('jobCards');
                 jobCardsContainer.innerHTML = '';
+                jobCardsContainer.style.display = 'flex';
+                jobCardsContainer.style.flexDirection = 'column';
+                jobCardsContainer.style.alignItems = 'center';
 
-                data.forEach(job => {
+                data.forEach((job) => {
                     const card = document.createElement('div');
                     card.classList.add('job-card');
+                    card.style.margin = '10px auto';
 
                     const title = document.createElement('h3');
                     title.textContent = job.title;
@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             fetch(`http://127.0.0.1:5000/api/jobs/${job.id}`, {
                                 method: 'DELETE',
                                 headers: {
-                                    'Authorization': AUTH_TOKEN // Добавляем токен авторизации
+                                    'Authorization': AUTH_TOKEN 
                                 }
                             }).then(() => {
                                 card.remove();
@@ -61,10 +61,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     jobCardsContainer.appendChild(card);
                 });
+
+                setTimeout(() => {
+                    jobCardsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 300);
             });
     });
 
-    // Show form to add a job
     document.getElementById('publishJob').addEventListener('click', function() {
         if (isAuthorized) {
             document.getElementById('addJobForm').style.display = 'block';
@@ -73,7 +76,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Submit new job
     document.getElementById('submitJob').addEventListener('click', function() {
         const jobTitle = document.getElementById('jobTitle').value;
         const jobDescription = document.getElementById('jobDescription').value;
@@ -89,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': AUTH_TOKEN // Добавляем токен авторизации
+                'Authorization': AUTH_TOKEN 
             },
             body: JSON.stringify(newJob)
         })
@@ -100,25 +102,24 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Login and logout functionality
     document.getElementById('loginButton').style.display = 'inline-block';
     document.getElementById('loginButton').addEventListener('click', function() {
         if (isAuthorized) {
-            // Logout
             isAuthorized = false;
             localStorage.setItem('isAuthorized', 'false');
             document.getElementById('publishJob').style.display = 'none';
             document.getElementById('loginButton').textContent = 'Войти';
             alert('Вы вышли из системы.');
+            location.reload();
         } else {
-            // Login
             const password = prompt('Введите ключ-пароль для авторизации:');
-            if (password === AUTH_TOKEN) { // Используем токен авторизации
+            if (password === AUTH_TOKEN) { 
                 isAuthorized = true;
                 localStorage.setItem('isAuthorized', 'true');
                 document.getElementById('publishJob').style.display = 'inline-block';
                 document.getElementById('loginButton').textContent = 'Выйти';
                 alert('Вы успешно авторизовались!');
+                location.reload();
             } else {
                 alert('Неверный ключ-пароль. Попробуйте снова.');
             }
